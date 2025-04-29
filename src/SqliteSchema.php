@@ -16,16 +16,11 @@ namespace spriebsch\sqlite;
  */
 abstract class SqliteSchema
 {
-    private Connection $connection;
+    protected function __construct(private readonly Connection $connection) {}
 
     public static function from(Connection $connection): static
     {
         return new static($connection);
-    }
-
-    protected function __construct(Connection $connection)
-    {
-        $this->connection = $connection;
     }
 
     public function createIfNotExists(): void

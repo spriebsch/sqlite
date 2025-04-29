@@ -15,10 +15,11 @@ use SQLite3;
 use SQLite3Result;
 use SQLite3Stmt;
 
-final class SqliteConnection implements Connection
+final readonly class SqliteConnection implements Connection
 {
-    private ?SQLite3 $connection = null;
-    private string   $database;
+    private SQLite3 $connection;
+
+    private function __construct(private string $database) {}
 
     public static function memory(): self
     {
@@ -28,11 +29,6 @@ final class SqliteConnection implements Connection
     public static function from(string $database): self
     {
         return new self($database);
-    }
-
-    private function __construct(string $database)
-    {
-        $this->database = $database;
     }
 
     public function isInMemoryDatabase(): bool
@@ -62,12 +58,10 @@ final class SqliteConnection implements Connection
 
     public function connection(): Sqlite3
     {
-        if ($this->connection === null) {
+        if (!isset($this->connection)) {
             $this->connection = new SQLite3($this->database);
-            $this->connection->exec('PRAGMA journal_mode=WAL');
-            $this->connection->exec('PRAGMA busy_timeout=10000');
-
             $this->connection->enableExceptions(true);
+            $this->connection->exec('PRAGMA busy_timeout=10000');
         }
 
         return $this->connection;
