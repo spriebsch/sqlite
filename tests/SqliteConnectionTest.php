@@ -94,6 +94,22 @@ class SqliteConnectionTest extends TestCase
         $this->assertEquals($this->rowAsArray(), $result->fetchArray(SQLITE3_ASSOC));
     }
 
+    public function test_escape_string_allows_manual_value_insertion(): void
+    {
+        $original = "O'Reilly";
+        $escaped = $this->connection->escapeString($original);
+
+        // Basic expectation: single quotes are doubled for SQL string literals
+        $this->assertSame("O''Reilly", $escaped);
+
+        // Use the escaped value in a raw SQL statement and ensure round-trip integrity
+        $this->connection->exec("INSERT INTO test (value) VALUES ('$escaped')");
+
+        $result = $this->connection->query('SELECT value FROM test ORDER BY id DESC LIMIT 1');
+        $row = $result->fetchArray(SQLITE3_ASSOC);
+        $this->assertSame($original, $row['value']);
+    }
+
     private function insertRow(SqliteConnection $connection): void
     {
         $connection->exec("INSERT INTO test (value) VALUES ('the-value')");

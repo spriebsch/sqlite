@@ -56,6 +56,11 @@ final readonly class SqliteConnection implements Connection
         return $this->connection()->query($query);
     }
 
+    public function escapeString(string $value): string
+    {
+        return $this->connection()->escapeString($value);
+    }
+
     public function connection(): Sqlite3
     {
         if (!isset($this->connection)) {

@@ -25,4 +25,9 @@ interface Connection
     public function exec(string $statement): bool;
 
     public function query(string $query): SQLite3Result;
+
+    /**
+     * Escapes a string for safe inclusion in SQL.
+     */
+    public function escapeString(string $value): string;
 }
